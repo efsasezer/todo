@@ -14,16 +14,16 @@ import 'add_task_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await GetStorage.init();
-  runApp(MyApp());
+  await Firebase.initializeApp(); // Firebase'i başlat
+  await GetStorage.init(); // GetStorage'i başlat
+  runApp(MyApp()); // Uygulamayı başlat
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false, // Debug banner'ı gizle
       title: 'Todo App',
       theme: ThemeData.dark().copyWith(
         colorScheme: const ColorScheme.dark(
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: TodoApp(),
+      home: TodoApp(), // Ana uygulama widget'ı
       routes: {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
@@ -55,10 +55,11 @@ class TodoApp extends StatefulWidget {
 }
 
 class _TodoAppState extends State<TodoApp> {
-  final TaskService _taskService = TaskService();
-  final AuthService _authService = AuthService();
-  final String userId = 'Hjzdmauw1pc28l1JjR2zgJawHVC3';
-  String searchQuery = "";
+  final TaskService _taskService = TaskService(); // Task işlemleri için servis
+  final AuthService _authService =
+      AuthService(); // Yetkilendirme işlemleri için servis
+  final String userId = 'Hjzdmauw1pc28l1JjR2zgJawHVC3'; // Kullanıcı ID'si
+  String searchQuery = ""; // Arama sorgusu
 
   @override
   Widget build(BuildContext context) {
@@ -71,27 +72,28 @@ class _TodoAppState extends State<TodoApp> {
             IconButton(
               icon: Icon(Icons.exit_to_app),
               onPressed: () async {
-                await _authService.signOut();
-                Get.offAllNamed('/login');
+                await _authService.signOut(); // Kullanıcıyı çıkış yaptır
+                Get.offAllNamed('/login'); // Giriş sayfasına yönlendir
               },
             ),
           ],
           bottom: TabBar(
             tabs: [
-              Tab(text: 'Tamamlanmamış'),
-              Tab(text: 'Tamamlanmış'),
+              Tab(text: 'Tamamlanmamış'), // İlk sekme
+              Tab(text: 'Tamamlanmış'), // İkinci sekme
             ],
           ),
         ),
         body: TabBarView(
           children: [
-            buildTaskList(false),
-            buildTaskList(true),
+            buildTaskList(false), // Tamamlanmamış görevler
+            buildTaskList(true), // Tamamlanmış görevler
           ],
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Get.to(() => AddTaskPage(userId: userId));
+            Get.to(() => AddTaskPage(
+                userId: userId)); // Görev ekleme sayfasına yönlendir
           },
           child: Icon(Icons.add),
         ),
@@ -106,22 +108,25 @@ class _TodoAppState extends State<TodoApp> {
           padding: const EdgeInsets.all(8.0),
           child: TextField(
             decoration: InputDecoration(
-              labelText: 'Ara',
+              labelText: 'Ara', // Arama kutusunun etiketi
               prefixIcon: Icon(Icons.search),
             ),
             onChanged: (value) {
               setState(() {
-                searchQuery = value;
+                searchQuery = value; // Arama sorgusunu güncelle
               });
             },
           ),
         ),
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
-            stream: _taskService.getTasks(userId, completed, searchQuery),
+            stream: _taskService.getTasks(
+                userId, completed, searchQuery), // Görevleri al
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
-                return Center(child: CircularProgressIndicator());
+                return Center(
+                    child:
+                        CircularProgressIndicator()); // Veri yoksa yükleniyor göstergesi
               }
 
               final tasks = snapshot.data!.docs
@@ -133,14 +138,15 @@ class _TodoAppState extends State<TodoApp> {
                 itemBuilder: (context, index) {
                   final task = tasks[index];
                   return ListTile(
-                    title: Text(task.title),
+                    title: Text(task.title), // Görev başlığını göster
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Checkbox(
                           value: task.completed,
                           onChanged: (value) {
-                            _taskService.updateTask(task.id, value!);
+                            _taskService.updateTask(
+                                task.id, value!); // Görevi güncelle
                           },
                         ),
                         IconButton(
@@ -149,13 +155,14 @@ class _TodoAppState extends State<TodoApp> {
                             Get.to(() => UpdateTaskPage(
                                   taskId: task.id,
                                   initialTitle: task.title,
-                                ));
+                                )); // Görev düzenleme sayfasına yönlendir
                           },
                         ),
                         IconButton(
                           icon: Icon(Icons.delete),
                           onPressed: () async {
-                            await _taskService.deleteTask(task.id);
+                            await _taskService
+                                .deleteTask(task.id); // Görevi sil
                           },
                         ),
                       ],

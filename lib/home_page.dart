@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.exit_to_app),
             onPressed: () async {
-              await homeController.signOut();
+              await homeController.signOut(); // Kullanıcıyı çıkış yapar
             },
           ),
         ],
@@ -37,18 +37,22 @@ class HomePage extends StatelessWidget {
                 ),
               ],
               isSelected: [
-                !homeController.showCompleted.value,
-                homeController.showCompleted.value
+                !homeController
+                    .showCompleted.value, // Tamamlanmamış görevleri göster
+                homeController
+                    .showCompleted.value // Tamamlanmış görevleri göster
               ],
               onPressed: (index) {
-                homeController.showCompleted.value = index == 1;
+                homeController.showCompleted.value =
+                    index == 1; // Seçilen sekmeye göre görevleri göster
               },
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              controller: homeController.searchController,
+              controller:
+                  homeController.searchController, // Arama giriş kontrolcüsü
               decoration: InputDecoration(
                 labelText: 'Ara',
                 prefixIcon: Icon(Icons.search),
@@ -62,29 +66,33 @@ class HomePage extends StatelessWidget {
           Expanded(
             child: Obx(
               () => StreamBuilder<QuerySnapshot>(
-                stream: homeController.getTasks(),
+                stream: homeController.getTasks(), // Görevleri dinleyen stream
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(
+                        child:
+                            CircularProgressIndicator()); // Veriler yükleniyorsa yüklenme göstergesi
                   }
 
-                  var tasks = snapshot.data!.docs;
+                  var tasks = snapshot.data!.docs; // Görevleri al
 
                   return ListView.builder(
-                    itemCount: tasks.length,
+                    itemCount: tasks
+                        .length, // Görev sayısına göre liste elemanı oluştur
                     itemBuilder: (context, index) {
                       var task = tasks[index];
                       return ListTile(
-                        title: Text(task['title']),
+                        title: Text(task['title']), // Görev başlığını göster
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Checkbox(
-                              value: task['completed'],
+                              value: task[
+                                  'completed'], // Görevin tamamlanma durumunu göster
                               onChanged: (bool? value) {
                                 if (value != null) {
-                                  homeController.toggleTaskCompletion(
-                                      task.id, value);
+                                  homeController.toggleTaskCompletion(task.id,
+                                      value); // Görev tamamlanma durumunu güncelle
                                 }
                               },
                             ),
@@ -95,8 +103,9 @@ class HomePage extends StatelessWidget {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => UpdateTaskPage(
-                                      taskId: task.id,
-                                      initialTitle: task['title'],
+                                      taskId: task.id, // Görev ID'si
+                                      initialTitle:
+                                          task['title'], // Görev başlığı
                                     ),
                                   ),
                                 );
@@ -105,7 +114,8 @@ class HomePage extends StatelessWidget {
                             IconButton(
                               icon: Icon(Icons.delete),
                               onPressed: () async {
-                                await homeController.deleteTask(task.id);
+                                await homeController
+                                    .deleteTask(task.id); // Görevi sil
                               },
                             ),
                           ],
@@ -124,8 +134,9 @@ class HomePage extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  AddTaskPage(userId: homeController.user?.uid ?? ''),
+              builder: (context) => AddTaskPage(
+                  userId: homeController.user?.uid ??
+                      ''), // Yeni görev ekleme sayfasına yönlendir
             ),
           );
         },
